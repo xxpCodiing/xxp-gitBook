@@ -13,7 +13,7 @@
 
 ## 常用的兼容解决方式
 
-> 条件注释
+### 条件注释
 
 ![条件注释](../imgs/compatible/ie_1.png)
 
@@ -33,7 +33,7 @@
 
 **注：IE10 不再支持条件注释**
 
-> js判断浏览器类型 navigator.userAgent对象
+### js判断浏览器类型 navigator.userAgent对象
 
 ```
  var browser = {
@@ -57,25 +57,68 @@
 ```
 
 ## 一 HTML5标签兼容性
-#### 解决方法
+
+* HTML5的新标签元素 在IE6/IE7/IE8上并不能识别
+
+> 编码解决
+
+```
+    <!--[if lt IE9]> 
+    <script> 
+    (function() {     if (! 
+        /*@cc_on!@*/
+        0) return;     var e = "abbr, article, aside, audio, canvas, datalist, details, dialog, eventsource, figure, footer, header, hgroup, mark, menu, meter, nav, output, progress, section, time, video".split(', ');     var i= e.length;     while (i--){
+            document.createElement(e[i])
+        } 
+    })() 
+    </script>
+    <![endif]-->
+```
+
+> 使用Google的html5shiv包（推荐）
+
+```
+<!--[if lt IE9]> 
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->    
+```
+
 ## 二 CSS3兼容性
 
-> css3 属性兼容列表
+### css3 属性兼容列表
 
   ![css3 属性兼容列表](../imgs/compatible/ie_2.gif)
 
-> css3 选择器兼容列表
+### css3 选择器兼容列表
  
   ![css3 选择器兼容列表](../imgs/compatible/ie_3.gif)
 
-> 默认margin padding 不同 
+### 默认margin padding 不同 
 
 * h1-h6,ol,ul,p,form 等...标签中有默认的margin padding 值
 ```
     *{margin:0;padding:0;}
+
+    // 或
+
+    <link href="https://cdn.bootcss.com/normalize/7.0.0/normalize.min.css" rel="stylesheet">
 ```
 
-> 仅在ie中生效的css
+### 盒子模型不同
+
+chrome,firefox,IE9,IE10,IE11的盒模型为 标准盒模型  实际的宽/高 = width/height + 2padding + 2border;
+
+IE6-8盒子模型 怪异盒模型
+
+``` 
+    // 采用标准模式解析计算，默认模式
+    box-sizing:content-box
+    // 采用怪异模式解析计算
+    box-sizing:border-box
+```
+
+
+### 仅在ie中生效的css
  
  ```
  @media screen and(-ms-high-contrast:active),(-ms-high-contrast:none){
@@ -85,7 +128,7 @@
 }
  ```
 
-> CSS Hack
+### CSS Hack
 
 ```
     .box {
@@ -98,7 +141,7 @@
 [链接：更多cssHack方式 参考 CSS hack合集_w3cschool](https://www.w3cschool.cn/lugfe/lugfe-vxfp25zq.html)
 
 
-> 各主流浏览器私有属性兼容
+### 各主流浏览器私有属性兼容
 
 * Webkit 类型（如 Safari、Chrome）的私有属性是以-webkit-前缀开始。
 * Gecko 类型（如 Firefox）的私有属性是以-moz-前缀开始。
@@ -139,9 +182,9 @@
 
 
 ## 三 JS 兼容性
-#### 1. ES6
+###  ES6
 
-> 桌面浏览前对ES6的支持情况
+#### 桌面浏览前对ES6的支持情况
 
 * Chrome：51 版起便可以支持 97% 的 ES6 新特性。
 * Firefox：53 版起便可以支持 97% 的 ES6 新特性。
@@ -150,11 +193,11 @@
 
 ![es6支持情况描述](../imgs/compatible/es6-note.png)
 
-> 保证es6的兼容性的方式
+#### 保证es6的兼容性的方式
 
 * 比较通用的工具方案有 babel，traceur，es6-shim 等
 
-> 解决用例
+#### 解决用例
 
 * 引入browser.min.js ; script标签的type的值设为text/babel。
 
@@ -263,33 +306,79 @@
 
 
 
-#### 2. PROMISE AJAX FETCH AXIOS
+###  PROMISE AJAX FETCH AXIOS
 
-> promise 兼容 
+#### promise 兼容 
 
 ![promise兼容](../imgs/compatible/ie_6.png)
 
+> 使用第三方插件bluebird.js
 
-> ajxa 兼容性
+bluebird中对ES6的原生Promise进行了封装，解决了浏览器兼容性问题
+
+```
+//引入promise
+if(!Promise){
+    var Promise = require("bluebird");
+  // Configure
+    Promise.config({
+      longStackTraces: true,
+      warnings: true // note, run node with --trace-warnings to see full stack traces for warnings
+    })
+}
+```
+
+[链接：bluebird官方文档]()
+
+> 使用es6-promise
+
+```
+    // 安装
+    npm install es6-promise
+
+    // 使用
+    var Promise = require('es6-promise').Promise;
+
+    // Usage in IE<9
+    promise['catch'](function(err) {
+        // ...
+    });
+
+    promise['finally'](function() {
+        // ...
+    });
+
+    //  Auto-polyfill
+    require('es6-promise').polyfill();
+```
+
+[链接：es6-promise](https://www.npmjs.com/package/es6-promise)
+
+> 使用babel-polyfill
+  
+同axios兼容解决
+
+
+#### ajxa 兼容性
 
 ![ajax兼容](../imgs/compatible/ie_4.png)
 
 
 ** IE下  responseType不支持json    会返回undefined **
 
-* 添加meta  强制edge
+> 添加meta  强制edge
 
 ```
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 ```
 
-* json2.js json3.js 序列化返回
+> json2.js json3.js 序列化返回
 
 
 
 
 
-> fetch 兼容
+#### fetch 兼容
 
 ![fetch兼容](../imgs/compatible/ie_5.png)
 
@@ -322,6 +411,162 @@ Fetch polyfill 的基本原理是探测是否存在 window.fetch 方法，如果
 [链接：fetch兼容相关问题](https://github.com/camsong/blog/issues/2)
 
 
-## 四 BOM DOM兼容性
-## 五 HACK兼容写法
-## 六 项目中遇到的兼容问题
+#### axios 兼容
+
+axios支持IE8+，但原理是基于promise之上实现的，因此会存在不兼容IE的问题
+
+>解决方案  也参考上面promise兼容解决方案
+
+```
+    // 安装babel-polyfill
+    npm  install  babel-polyfill
+    
+    // main.js 中引入 babel-polyfill
+    import 'babel-polyfill'
+
+    //webpack.base.config.js 中 entry
+    module.exports = {
+    context: path.resolve(__dirname, '../'),
+    entry: {
+        app: ["babel-polyfill", "./src/main.js"] 
+    },
+    }
+```
+
+## 四 DOM事件兼容性
+
+### 页面滚动距离
+
+*  window.pageXOffset/pageYOffset   // ie8及以下不兼容
+*  document.body/documentElement . scrollLeft/scrollTop // 兼容性比较混乱  用时取两个值相加  因为不可能存在两个同时的值
+
+> 封装兼容方法
+
+```
+    function getScrollOffset(){
+        if(window.pageXOffset){
+            return {
+                x:window.pageXOffset,
+                y:window.pageYOffset
+            }
+        }else{
+            return {
+                x:document.body.scrollLeft + document.documentElement.scrollLeft
+                y:document.body.scrollTop + document.documentElement.scrollTop
+            }
+        }
+    }
+```
+
+### 查看视口的尺寸
+
+* window.innerWidth/innerHeight   //ie8及以下不兼容
+* document.documentElement.clientWidth/clientHeight //标准模式下 任意浏览器都兼容
+* document.body.clientWidth/clientHeight //适用于怪异模式下的浏览器
+
+> 封装兼容方法
+
+```
+    function getViewportOffset(){
+        if(window.innerWidth){
+            return {
+                w:window.innderWidth,
+                h:window.innerHeight
+            }
+        }else{
+            if(document.compatMode === 'BackCompat'){
+                return {
+                    w:document.body.clientWidth,
+                    h:document.body.clientHeight
+                }
+            }else{
+                return {
+                    w:document.documentElement.clientWidth,
+                    h:document.documentElement.clientHeight
+                }
+            }
+        }
+    }
+```
+
+### dom元素获取计算属性
+
+* window.getComputedStyle(div,null)   //ie8及ie8以下不兼容
+* div.currentStyle  // ie获取计算属性
+
+> 封装兼容性方法
+
+```
+function getStyle(elem,prop){
+    if(window.getComputedStyle){
+        return window.getComputedStyle(elem,null)[prop]
+    }else{
+        return elem.currentStyle[prop]
+    }
+}
+```
+
+### click事件绑定
+
+* xx.onXXX = function(){}
+* xx.addEventListener(事件类型，处理函数，false) // ie以下不兼容
+* xx.attachEvent('on'+type,fn) //ie独有
+
+> 封装兼容click方法
+
+```
+    function addEvent(elem,type,handle){
+        if(elem.addEventListener){
+            elem.addEventListener(type,handle,false)
+        }else if(elem.attachEvent){
+            elem.attachEvent('on' + type,function(){
+                handle.call(elem)
+            })
+        }else{
+            elem['on'+type] = handle
+        }
+    }
+```
+
+### 解除事件绑定
+
+```
+    ele.onclick = false /''/ null
+    ele.removeEventListener(type,fn,false)
+    ele.detachEvent('on'+type,fn)
+```
+> 封装兼容处理
+
+```
+    function removeHandler(elem, type, listener) {
+        if (elem.removeEventListener) {
+            elem.removeEventListener(type, listener, false);
+        } else if (elem.detachEvent) {
+            elem.detachEvent('on' + type, listener);
+        } else {
+            elem['on' + type] = null;
+        }
+    }
+
+```
+
+### 阻止冒泡
+
+*  e.stopPropagation()   // ie 不兼容
+*  e.cancleBubble = true // ie 阻止冒泡
+
+> 封装阻止冒泡方法
+
+```
+    function stopBubble(event){
+        if(event.stopPropagation){
+            event.stopPropagation()
+        }else{
+            event.cancleBubble = true
+        }
+    }
+```
+
+## 五 项目中遇到的兼容问题
+
+[链接：项目中兼容问题搜集整理](https://confluence.cloudwalk.work/pages/viewpage.action?pageId=45835965)
